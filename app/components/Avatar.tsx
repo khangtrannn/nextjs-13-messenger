@@ -12,29 +12,19 @@ interface AvatarProps {
 const Avatar: React.FC<AvatarProps> = ({ user }) => {
   // const { members } = useActiveList();
   // const isActive = members.indexOf(user?.email!) !== -1;
+  const isActive = true;
 
   return (
-    <div className="relative">
-      <div
-        className="
-        relative 
-        inline-block 
-        rounded-full 
-        overflow-hidden
-        h-9 
-        w-9 
-        md:h-11 
-        md:w-11
-      "
-      >
+    <div className="relative flex">
+      <div className="relative inline-block rounded-full overflow-hidden h-9 w-9 md:h-11 md:w-11">
         <Image
           fill
           src={user?.image || "/images/placeholder.jpg"}
           alt="Avatar"
         />
       </div>
-      {/* {isActive ? (
-        <span 
+      {isActive ? (
+        <span
           className="
             absolute 
             block 
@@ -48,9 +38,9 @@ const Avatar: React.FC<AvatarProps> = ({ user }) => {
             w-2 
             md:h-3 
             md:w-3
-          " 
+          "
         />
-      ) : null} */}
+      ) : null}
     </div>
   );
 };

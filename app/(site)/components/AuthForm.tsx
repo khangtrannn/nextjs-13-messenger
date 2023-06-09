@@ -22,7 +22,7 @@ const AuthForm = () => {
   useEffect(() => {
     if (session?.status === "authenticated") {
       console.log("authenticated!");
-      router.push("/users");
+      router.push("/conversations");
     }
   }, [session?.status, router]);
 
@@ -52,18 +52,20 @@ const AuthForm = () => {
     if (variant === "REGISTER") {
       axios
         .post("/api/register", data)
-        // .then(() => signIn('credentials', {
-        //   ...data,
-        //   redirect: false,
-        // }))
-        // .then((callback) => {
-        //   if (callback?.error) {
-        //     toast.error('Invalid credentials!');
-        //   }
-        //   if (callback?.ok) {
-        //     router.push('/conversations')
-        //   }
-        // })
+        .then(() =>
+          signIn("credentials", {
+            ...data,
+            redirect: false,
+          })
+        )
+        .then((callback) => {
+          if (callback?.error) {
+            toast.error("Invalid credentials!");
+          }
+          if (callback?.ok) {
+            router.push("/conversations");
+          }
+        })
         .catch(() => toast.error("Something went wrong!"))
         .finally(() => setIsLoading(false));
     }
@@ -80,8 +82,7 @@ const AuthForm = () => {
           }
 
           if (callback?.ok) {
-            toast.success("Logged in!");
-            // router.push("/conversations");
+            router.push("/conversations");
           }
         })
         .finally(() => setIsLoading(false));
@@ -100,7 +101,7 @@ const AuthForm = () => {
 
         if (callback?.ok) {
           toast.success("Logged in success!");
-          // router.push('/conversations')
+          router.push("/conversations");
         }
       })
       .finally(() => setIsLoading(false));

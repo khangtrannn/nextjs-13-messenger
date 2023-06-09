@@ -4,14 +4,14 @@ import { User } from "@prisma/client";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MdOutlineGroupAdd } from "react-icons/md";
-// import { find, uniq } from 'lodash';
 
-import useConversation from "@/app/hooks/useConversation";
-// import { pusherClient } from "@/app/libs/pusher";
 import GroupChatModal from "@/app/components/modals/GroupChatModal";
+import useConversation from "@/app/hooks/useConversation";
+import { pusherClient } from "@/app/libs/pusher";
 import { FullConversationType } from "@/app/types";
+import { find } from "lodash";
 import ConversationBox from "./ConversationBox";
 
 interface ConversationListProps {
@@ -32,50 +32,56 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
   const { conversationId, isOpen } = useConversation();
 
-  // const pusherKey = useMemo(() => {
-  //   return session.data?.user?.email
-  // }, [session.data?.user?.email])
+  const pusherKey = useMemo(() => {
+    return session.data?.user?.email;
+  }, [session.data?.user?.email]);
 
-  // useEffect(() => {
-  // if (!pusherKey) {
-  //   return;
-  // }
+  useEffect(() => {
+    if (!pusherKey) {
+      return;
+    }
 
-  // pusherClient.subscribe(pusherKey);
+    pusherClient.subscribe(pusherKey);
 
-  //   const updateHandler = (conversation: FullConversationType) => {
-  //     setItems((current) => current.map((currentConversation) => {
-  //       if (currentConversation.id === conversation.id) {
-  //         return {
-  //           ...currentConversation,
-  //           messages: conversation.messages
-  //         };
-  //       }
+    const updateHandler = (conversation: FullConversationType) => {
+      setItems((current) =>
+        current.map((currentConversation) => {
+          if (currentConversation.id === conversation.id) {
+            return {
+              ...currentConversation,
+              messages: conversation.messages,
+            };
+          }
 
-  //       return currentConversation;
-  //     }));
-  //   }
+          return currentConversation;
+        })
+      );
+    };
 
-  //   const newHandler = (conversation: FullConversationType) => {
-  //     setItems((current) => {
-  //       if (find(current, { id: conversation.id })) {
-  //         return current;
-  //       }
+    const newHandler = (conversation: FullConversationType) => {
+      setItems((current) => {
+        if (find(current, { id: conversation.id })) {
+          return current;
+        }
 
-  //       return [conversation, ...current]
-  //     });
-  //   }
+        return [conversation, ...current];
+      });
+    };
 
-  //   const removeHandler = (conversation: FullConversationType) => {
-  //     setItems((current) => {
-  //       return [...current.filter((convo) => convo.id !== conversation.id)]
-  //     });
-  //   }
+    const removeHandler = (conversation: FullConversationType) => {
+      setItems((current) => {
+        return [...current.filter((convo) => convo.id !== conversation.id)];
+      });
 
-  //   pusherClient.bind('conversation:update', updateHandler)
-  //   pusherClient.bind('conversation:new', newHandler)
-  //   pusherClient.bind('conversation:remove', removeHandler)
-  // }, [pusherKey, router]);
+      if (conversationId === conversation.id) {
+        router.push("/conversations");
+      }
+    };
+
+    pusherClient.bind("conversation:update", updateHandler);
+    pusherClient.bind("conversation:new", newHandler);
+    pusherClient.bind("conversation:remove", removeHandler);
+  }, [pusherKey, router, conversationId]);
 
   return (
     <>

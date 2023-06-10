@@ -36,9 +36,11 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
 
   return (
     <div className={container}>
-      <div className={avatar}>
-        <Avatar user={data.sender} />
-      </div>
+      {!isOwn ? (
+        <div className={avatar}>
+          <Avatar user={data.sender} />
+        </div>
+      ) : null}
       <div className={body}>
         <div className="flex items-center gap-1">
           <div className="text-sm text-gray-500">{data.sender.name}</div>
